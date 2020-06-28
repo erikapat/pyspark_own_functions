@@ -50,9 +50,9 @@ def complete_missing_days(df: DataFrame, time_col: str, referece_col: str, spark
     # 1.- list of intermediates dates
     all_days_in_range = list_intermediate_dates(df, time_col)
     # 2.- create the complete dataset
-    people = [row[referece_col] for row in df.select(referece_col).distinct().collect()]
+    reference_column = [row[referece_col] for row in df.select(referece_col).distinct().collect()]
     
-    dates_by_var = spark.createDataFrame(product(people, all_days_in_range),
+    dates_by_var = spark.createDataFrame(product(reference_column, all_days_in_range),
                                             schema=(referece_col, time_col))
     
 
