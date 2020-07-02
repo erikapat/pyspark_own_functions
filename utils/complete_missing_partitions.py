@@ -49,7 +49,7 @@ def complete_missing_months(df: DataFrame, time_col: str, referece_col: str, spa
     #3. complete
     df2 = (df.join(dates_by_var,
                                     [time_col, referece_col],
-                                    how="full")
+                                    how= "full")
                )
     return df2
 
