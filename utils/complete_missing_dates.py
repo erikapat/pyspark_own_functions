@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from itertools import product
 from pyspark.sql.types import DateType
 from pyspark.sql.functions import unix_timestamp
+from pyspark.sql.functions import col, count, isnan, lit, sum
 
 
 
@@ -65,6 +66,29 @@ def complete_missing_days(df: DataFrame, time_col: str, referece_col: str, spark
     return df2
 
 
+
+
+def count_nulls_by_column(df, group_column: str = None):
+    '''
+    Count the number of missing values by group in several columns (only for numerical variables)
+    '''
+    def count_null(c):
+        """Use conversion between boolean and integer
+        - False -> 0
+        - True ->  1
+        """
+        pred = col(c).isNull() | isnan(c)
+        return sum(pred.cast("integer")).alias(c)
+    
+    #only for numerical variables
+    exclude_cols = [c for c, t in df.dtypes if t in ('string', 'timestamp') ]
+    df = df.drop(*exclude_cols)
+    df_cols = df.columns
+    if (group_column):
+        df = df.groupby(group_column)
+
+    return df.agg(*[count_null(c) for c in df_cols])
+
 #--------------------------------------------------------------------------------------------------
 
 def df_col_rename(X, to_rename, replace_with):
@@ -78,3 +102,5 @@ def df_col_rename(X, to_rename, replace_with):
     mapping = dict(zip(to_rename, replace_with))
     X = X.select([F.col(c).alias(mapping.get(c, c)) for c in to_rename])
     return X
+
+
