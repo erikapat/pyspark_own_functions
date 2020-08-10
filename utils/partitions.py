@@ -51,8 +51,18 @@ def sustract_days_partition(date_value: column, data_depth_days: int) -> str:
                                            relativedelta(days = data_depth_days),
                                            '%Y%m%d'
                                           )
+
+
 def add_days_partition(date_value: column, data_depth_days: int) -> str:
     return datetime.strftime(datetime.strptime(date_value, '%Y%m%d') +
                                            relativedelta(days = data_depth_days),
                                            '%Y%m%d'
                                           )
+
+
+def agg_month_partition(col_name: column, val: int = 1) -> column:
+    '''
+    Each date with their month partition format yyyy-MM-dd
+    Ex. 2019-12-31 ---> 2019-01-31
+    '''
+    return sf.date_format(sf.add_months(col_name, val), "yyyy-MM-dd")

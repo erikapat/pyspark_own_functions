@@ -64,3 +64,25 @@ def arrays_last_n_df_rows(df_att: DataFrame,
        .agg(sf.collect_list('movs').alias('values')))
    
     return df_f
+
+
+'''
+#susbstract values from a column
+
+
+Subtract functions
+-----------------------------------------------------------------------------------------------------
+from pyspark.sql.functions import length
+def contract_values(df, contract_number, contract_name):
+    df = (df
+    .withColumn('leng', length(col(contract_number)))
+    .withColumn('leng9', length(col(contract_number)) - 9 )
+    .withColumn('leng19', length(col(contract_number)) - (9 + 26) )
+    .withColumn(contract_name, sf.col(contract_number)
+                .substr(length(col(contract_number)) - (9 + 26),  length(col(contract_number)) - 18  )) #14
+    .withColumn('leng_final', length(col(contract_name)))
+
+          )
+    return df
+
+'''

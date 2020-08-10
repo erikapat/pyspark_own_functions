@@ -1,10 +1,30 @@
 - count duplicates columns
 https://stackoverflow.com/questions/53808602/pyspark-drop-columns-that-have-same-values-in-all-rows
-- check duplicated rows 
 - complete historical data
 - count missing partitions
 - check if df_transformation works and create data.frame
 - widgets.py
+- medidas de tendencia central, valores nmás comunes, oercentiles, relación de la distribución con respecto aun variable, mutual information, correlaciones, coeficiente de incertidumbre
+
+
+Check
+
+
+from typing import List
+import pyspark.sql.functions as sf
+from pipeforge.common.table import Table
+from pyspark.sql import DataFrame
+import pandas as pd
+from pyspark.sql.types import DateType
+from pipeforge.utils.spark import Spark
+
+
+def read_table_between_dates(table: Table, partition_name: str, init_partition: str,
+                             end_partition: str) -> DataFrame:
+    return table.read().where(sf.col(partition_name).between(init_partition, end_partition))
+
+
+
 
 
 
