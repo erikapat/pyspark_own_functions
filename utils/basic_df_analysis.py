@@ -11,28 +11,18 @@ from dateutil.relativedelta import relativedelta
 import sys
 
 
-
-# check duplicates
-
-def check_duplicates(df: DataFrame, listOfColumns: str = None)-> DataFrame:
+def check_duplicates(df: DataFrame, listOfColumns: str = None, show_val: int = 20)-> DataFrame:
     if df.count() > df.dropDuplicates(listOfColumns).count():
-        print('Data has duplicates')
-
-    return df \
+        print('Data has duplicates:')
+    
+    df1 = df \
         .groupby(listOfColumns) \
         .count() \
-        .where('count > 1') \
+        .where('count > 1') 
+    return df1 \
         .sort('count', ascending=False) \
-        .show()
+        .show(show_val, False) 
 
-
-
-
-def check_duplicates2(df: DataFrame, listOfColumns: str = None)-> DataFrame:
-    if df.count() > df.dropDuplicates(listOfColumns).count():
-        raise ValueError('Data has duplicates')
-
-    
 
 #----------------------------------------- --------------------------------------------------------------------------------------------
 #count nulls
