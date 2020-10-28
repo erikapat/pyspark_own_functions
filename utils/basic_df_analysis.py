@@ -25,11 +25,13 @@ def check_duplicates(df: DataFrame, listOfColumns: str = None, show_val: int = 2
 
 
 #----------------------------------------- --------------------------------------------------------------------------------------------
-#count nulls
-
+# Nulls per partition
+from pyspark.sql.functions import col, count, isnan, lit, sum
 def count_nulls_by_column(df: DataFrame, group_column: str = None)-> DataFrame:
     '''
     Count the number of missing values by group in several columns (only for numerical variables)
+    df: dataframe
+    group_column: grouped by
     '''
     def count_null(c):
         """
@@ -42,7 +44,10 @@ def count_nulls_by_column(df: DataFrame, group_column: str = None)-> DataFrame:
     
     #only for numerical and string variables
     exclude_cols = [c for c, t in df.dtypes if t in ( 'timestamp') ]
-    df = df.drop(*exclude_cols)
+    timestamp_type = exclude_cols + group_column
+    for c in timestamp_type:
+        df = df.withColumn(c, df[c].cast('string'))
+    
     df_cols = df.columns
     if (group_column):
         df = df.groupby(group_column)
