@@ -42,9 +42,9 @@ def count_nulls_by_column(df: DataFrame, group_column: str = None)-> DataFrame:
         pred = col(c).isNull() | isnan(c)
         return sum(pred.cast("integer")).alias(c)
     
-    #only for numerical and string variables
-    exclude_cols = [c for c, t in df.dtypes if t in ( 'timestamp') ]
-    timestamp_type = exclude_cols + group_column
+    #consider all type of variables
+    cols = [c for c, t in df.dtypes if t in ('timestamp', 'date', 'array', 'string') ]
+    timestamp_type = cols + group_column
     for c in timestamp_type:
         df = df.withColumn(c, df[c].cast('string'))
     

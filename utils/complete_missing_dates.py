@@ -39,7 +39,6 @@ def list_intermediate_dates(df: DataFrame, time_col: str) -> list:
     
     return all_days_in_range
     
- 
 def complete_missing_days(df: DataFrame, time_col: str, referece_col: str, spark) -> DataFrame:
     
     '''
