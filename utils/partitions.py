@@ -6,6 +6,8 @@ from pyspark.sql import Window, DataFrame, column
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from pyspark.sql.functions import unix_timestamp
+from typing import List
+
 
 def montly_partition_YYmmdd(col_date: column) -> column:
     '''
@@ -17,18 +19,12 @@ def montly_partition_YYmmdd(col_date: column) -> column:
     return unix_timestamp(col_date, 'yyyyMMdd').cast("timestamp")
 
 
-
-def create_partitions_from_df(col_name: column) -> column:
+def create_partitions_from_df(col_name: column, format = "yyyyMMdd") -> column:
     '''
     Each date with their month partition format yyyyMMdd
+    format could be "yyyyMMdd" or "yyyy-MM-dd"
     '''
-    return sf.date_format(sf.date_sub(sf.add_months(sf.trunc(col_name, 'month'),1),1), "yyyyMMdd")
-
-def create_partitions_from_df_sep(col_name: column) -> column:
-    '''
-    Each date with their month partition format yyyy-MM-dd
-    '''
-    return sf.date_format(sf.date_sub(sf.add_months(sf.trunc(col_name, 'month'),1),1), "yyyy-MM-dd")
+    return sf.date_format(sf.date_sub(sf.add_months(sf.trunc(col_name, 'month'),1),1), format)
 
 
 def init_day_partition(date_value: str) -> str:
@@ -66,3 +62,5 @@ def agg_month_partition(col_name: column, val: int = 1) -> column:
     Ex. 2019-12-31 ---> 2019-01-31
     '''
     return sf.date_format(sf.add_months(col_name, val), "yyyy-MM-dd")
+
+

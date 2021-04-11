@@ -8,7 +8,7 @@ from pyspark.sql.functions import unix_timestamp
 from pyspark.sql.functions import col, count, isnan, lit, sum
 from dateutil.relativedelta import relativedelta
 import sys
-
+from utils.partitions import *
 
 
 ##########
@@ -91,7 +91,9 @@ def list_intermediate_months(df: DataFrame, time_col: str) -> list:
     
     # 2.-  create the intermediate dates
     first_date, last_date = [ts.date() for ts in min_max_timestamps]
-    all_month_in_range = [first_date + relativedelta(months=d) for d in range((last_date.month - first_date.month) + 1)]
+    delta_months = (last_date.year - first_date.year) * 12 + last_date.month - first_date.month
+    all_month_in_range = [first_date + relativedelta(months=d) for d in range((delta_months) + 1)] 
+    #all_month_in_range = [first_date + relativedelta(months=d) for d in range((last_date.month - first_date.month) + 1)] 
     
     return all_month_in_range
 
@@ -105,8 +107,10 @@ def complete_missing_months(df: DataFrame, time_col: str, referece_col: str, spa
     reference_col: column to maintein has reference (just one)
     '''
     
-    df = df.withColumn(time_col, first_day_month(time_col))
+    df = df.withColumn('monthly_partition', create_partitions_from_df(time_col, "yyyy-MM-dd").cast("timestamp"))
+    #.withColumn('date_aux', first_day_month(time_col))
     all_months_in_range =list_intermediate_months(df, time_col)
+    #print(all_months_in_range)
 
     reference_column = [row[referece_col] for row in df.select(referece_col).distinct().collect()]
 
@@ -118,7 +122,7 @@ def complete_missing_months(df: DataFrame, time_col: str, referece_col: str, spa
                                     [time_col, referece_col],
                                     how= "full")
                )
-    return df2
+    return df2 #.drop('date_aux')
 
 
 
