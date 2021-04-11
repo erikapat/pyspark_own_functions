@@ -1,16 +1,23 @@
-- count duplicates columns
+Pending by priority
+
+1. complete historical data
+- by year (ready)
+- for several years.
+
+2. count duplicates columns
 https://stackoverflow.com/questions/53808602/pyspark-drop-columns-that-have-same-values-in-all-rows
-- complete historical data
-- count missing partitions
-- check if df_transformation works and create data.frame
-- widgets.py
+3. count missing partitions
+4. check if df_transformation works and create data.frame
+5. widgets.py
+6. Basic statistics
 - medidas de tendencia central, valores nmás comunes, oercentiles, relación de la distribución con respecto aun variable, mutual information, correlaciones, coeficiente de incertidumbre
 - hacer una función que antes de un join chequee si las columnas claves son null (luego del join pueden desaparecer) y si la tabla tiene duplicados (se multiplica el tiempo de ejecución si esto pasa)
 - groupby to aggregate on a subset of columns (arqueotipos)
 - skew data functions
 
 
-Check
+
+7.-Check the following code
 
 
 from typing import List

@@ -105,8 +105,9 @@ def complete_missing_months(df: DataFrame, time_col: str, referece_col: str, spa
     reference_col: column to maintein has reference (just one)
     '''
     
-    df = df.withColumn(time_col, first_day_month(time_col))
-    all_months_in_range =list_intermediate_months(df, time_col)
+    df = df.withColumn('date_aux', first_day_month(time_col))
+    all_months_in_range =list_intermediate_months(df, 'date_aux')
+ 
 
     reference_column = [row[referece_col] for row in df.select(referece_col).distinct().collect()]
 

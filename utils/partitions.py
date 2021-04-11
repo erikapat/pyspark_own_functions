@@ -17,18 +17,12 @@ def montly_partition_YYmmdd(col_date: column) -> column:
     return unix_timestamp(col_date, 'yyyyMMdd').cast("timestamp")
 
 
-
-def create_partitions_from_df(col_name: column) -> column:
+def create_partitions_from_df(col_name: column, format = "yyyyMMdd") -> column:
     '''
     Each date with their month partition format yyyyMMdd
+    format could be "yyyyMMdd" or "yyyy-MM-dd"
     '''
-    return sf.date_format(sf.date_sub(sf.add_months(sf.trunc(col_name, 'month'),1),1), "yyyyMMdd")
-
-def create_partitions_from_df_sep(col_name: column) -> column:
-    '''
-    Each date with their month partition format yyyy-MM-dd
-    '''
-    return sf.date_format(sf.date_sub(sf.add_months(sf.trunc(col_name, 'month'),1),1), "yyyy-MM-dd")
+    return sf.date_format(sf.date_sub(sf.add_months(sf.trunc(col_name, 'month'),1),1), format)
 
 
 def init_day_partition(date_value: str) -> str:

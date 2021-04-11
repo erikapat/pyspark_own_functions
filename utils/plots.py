@@ -25,7 +25,7 @@ def plot_different_series(df, date_name, yaxis_field, title, ytitle):
 
     for i, y in enumerate(years):
         plt.plot('month', yaxis_field, data=df.loc[df.year==y, :], color=mycolors[i], label=y)
-        plt.text(df.loc[df.year==y, :].shape[0]-.9, df.loc[df.year==y, 'sum_amount'][-1:].values[0], y, fontsize=12, color=mycolors[i])
+        plt.text(df.loc[df.year==y, :].shape[0]-.9, df.loc[df.year==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
 
         # Decoration
         #plt.ylim(50,750)
