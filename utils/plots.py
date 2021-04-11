@@ -4,10 +4,52 @@ from dateutil.parser import parse
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Draw Plot
-def plot_different_series(df, date_name, yaxis_field, title, ytitle):
+
+# plot type and date
+def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitle,  dpi_value = 58):
     """
-    Plot annual series for each customer, x axis: mont, y axis: yaxis_field
+    Plot series by date and type,
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    import matplotlib.pyplot as plt
+    df = df.sort_values(by=[date_name])
+    type_ = df[type_col].unique()
+
+    mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
+                'steelblue', 'firebrick', 'mediumseagreen']      
+    plt.figure(figsize=(16,10), dpi= dpi_value)
+
+    for i, y in enumerate(type_):
+        plt.plot(date_name, yaxis_field, data=df.loc[df[type_col]==y, :], color=mycolors[i], label=y)
+        plt.text(df.loc[df[type_col]==y, :].shape[0]-.9, df.loc[df[type_col]==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
+
+        # Decoration
+        #plt.ylim(50,750)
+        #plt.xlim(-0.3, 11)
+        plt.ylabel(ytitle)
+        plt.yticks(fontsize=12, alpha=.7)
+        plt.xticks(fontsize=15, alpha=.7, rotation=30) # x tick size
+        plt.title(title, fontsize=22)
+        plt.grid(axis='y', alpha=.3)
+
+        # Remove borders
+        plt.gca().spines["top"].set_alpha(0.0)    
+        plt.gca().spines["bottom"].set_alpha(0.5)
+        plt.gca().spines["right"].set_alpha(0.0)    
+        plt.gca().spines["left"].set_alpha(0.5)   
+        plt.legend(loc='upper right', ncol=2, fontsize=12)
+
+    plt.show()
+    
+
+
+# Draw Plot
+def plot_different_series(df, date_name, yaxis_field, title, ytitle, dpi_value = 58):
+    """
+    Plot annual series for each customer, there is differentiation by year, x axis: month, y axis: yaxis_field
     :param df: pandas dataframe with the input data
     :param date_name: name of the field with the date
     :param yaxis_field: name of the field in the y-axis
@@ -21,7 +63,7 @@ def plot_different_series(df, date_name, yaxis_field, title, ytitle):
 
     mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
                 'steelblue', 'firebrick', 'mediumseagreen']      
-    plt.figure(figsize=(16,10), dpi= 58)
+    plt.figure(figsize=(16,10), dpi= dpi_value)
 
     for i, y in enumerate(years):
         plt.plot('month', yaxis_field, data=df.loc[df.year==y, :], color=mycolors[i], label=y)

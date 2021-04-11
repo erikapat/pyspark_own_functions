@@ -4,6 +4,10 @@ from pyspark.sql.functions import month
 #from pyspark.sql.functions import last_day
 import pyspark.sql.functions as F
 from datetime import datetime
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import lit, col
+from pyspark.sql.functions import explode, array, struct
+from typing import List
 
 
 def melt_function(df: DataFrame, by: str)-> DataFrame:
@@ -12,7 +16,6 @@ def melt_function(df: DataFrame, by: str)-> DataFrame:
     Function similar to melt. Transform columns in rows. This is useful
     for aggregations and graphs
     '''
-   
     # Filter dtypes and split into column names and type description
     cols, dtypes = zip(*((c, t) for (c, t) in df.dtypes if c not in by))
     # only homogeneous columns
@@ -42,8 +45,7 @@ def arrays_last_n_df_rows(df_att: DataFrame,
           .filter( col(partition_id) > str(date_init) )
           .select(custom_id, 'month', field_type, metric)
          )
-   
-    # 2. Transform from rows to columns (pivot)
+   # 2. Transform from rows to columns (pivot)
     reshaped_df = df.groupby(custom_id, field_type).pivot('month').max(metric).fillna(0)
 
     # 3. Reverse pivot - melt - from columns to rows
@@ -86,3 +88,26 @@ def contract_values(df, contract_number, contract_name):
     return df
 
 '''
+
+
+def to_explode(df: DataFrame, by: List[str]) -> DataFrame:
+    """
+    Function similar to melt. Transform columns in rows. This is useful
+    for aggregations and graphs
+
+    :param df: Original dataframe.
+    :param by:
+    :return DataFrame
+    """
+
+    # Filter dtypes and split into column names and type description
+    cols, dtypes = zip(*((c, t) for (c, t) in df.dtypes if c not in by))
+    # only homogeneous columns
+    assert len(set(dtypes)) == 1, "All columns have to be of the same type"
+
+    # create and explode an array of (column_name, column_value) structs
+    kvs = explode(array([
+    struct(lit(c).alias("field"), col(c).alias("movs")) for c in cols
+    ])).alias("kvs")
+
+    return df.select(by + [kvs]).select(by + ["kvs.field", "kvs.movs"])
