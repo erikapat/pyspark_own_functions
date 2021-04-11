@@ -8,6 +8,18 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit, col
 from pyspark.sql.functions import explode, array, struct
 from typing import List
+from pyspark.sql.functions import concat_ws, to_timestamp, date_format
+from pyspark.sql.functions import to_date
+from pyspark.sql.functions import unix_timestamp, from_unixtime
+
+def date_concatenation(df, field_name):
+    """
+    Concatenate month & hour (improvement do this by column)
+    """
+    df = (df.withColumn("date_2", to_date(from_unixtime(unix_timestamp('date', 'yyMMdd'))))
+                .withColumn("partition", to_timestamp('partition', 'yyyy-MM-dd HH:mm'))
+                .withColumn(field_name, to_timestamp(concat_ws(' ', date_format(col('date_2'), 'yyyy-MM-dd'), col('hour')), 'yyyy-MM-dd HH:mm')).drop('date_2', 'hour'))
+    return df.drop('date')
 
 
 def melt_function(df: DataFrame, by: str)-> DataFrame:
