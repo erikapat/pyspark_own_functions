@@ -17,4 +17,4 @@ The functions are in **utils**. The noteboks are only used as examples of how to
 
 6. [Basic statistical functions](./BasicStatisticalFunctions.ipynb)
 
-7. [Outliers]()
+7. [Outliers](./Outliers_values_test.ipynb)
