@@ -4,9 +4,35 @@ from dateutil.parser import parse
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# Pandas plot
+
+def plot_piramid(df, group_col, x_values, cat, title, x_title, ylabel):
+    """
+    Plot piramid,
+    :param df: pandas dataframe with the input data
+    :param group_col & group_col: categories
+    :param title, x_title, ylabel: main title and x-y labels
+    
+    """
+    
+    plt.figure(figsize=(13,10), dpi= 80)
+    order_of_bars = df[cat].unique()[::-1]
+    colors = [plt.cm.Spectral(i/float(len(df[group_col].unique())-1)) for i in range(len(df[group_col].unique()))]
+
+    for c, group in zip(colors, df[group_col].unique()):
+        sns.barplot(x=x_values, y=cat, data=df.loc[df[group_col]==group, :], order=order_of_bars, color=c, label=group)
+
+    # Decorations    
+    plt.xlabel(x_title)
+    plt.ylabel(ylabel)
+    plt.yticks(fontsize=12)
+    plt.title(title, fontsize=22)
+    plt.legend()
+    plt.show()
+    
 
 # plot type and date
-def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitle,  dpi_value = 58):
+def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitle,  dpi_value = 58, width = 16, height = 10):
     """
     Plot series by date and type,
     :param df: pandas dataframe with the input data
@@ -20,7 +46,7 @@ def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitl
 
     mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
                 'steelblue', 'firebrick', 'mediumseagreen']      
-    plt.figure(figsize=(16,10), dpi= dpi_value)
+    plt.figure(figsize=(width, height), dpi= dpi_value)
 
     for i, y in enumerate(type_):
         plt.plot(date_name, yaxis_field, data=df.loc[df[type_col]==y, :], color=mycolors[i], label=y)
@@ -31,7 +57,7 @@ def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitl
         #plt.xlim(-0.3, 11)
         plt.ylabel(ytitle)
         plt.yticks(fontsize=12, alpha=.7)
-        plt.xticks(fontsize=15, alpha=.7, rotation=30) # x tick size
+        plt.xticks(fontsize=15, alpha=.7, rotation=90) # x tick size
         plt.title(title, fontsize=22)
         plt.grid(axis='y', alpha=.3)
 
