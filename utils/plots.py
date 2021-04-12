@@ -81,7 +81,7 @@ def plot_different_series(df, date_name, yaxis_field, title, ytitle, dpi_value =
     :param yaxis_field: name of the field in the y-axis
     
     """
-    import matplotlib.pyplot as plt
+    
     df['year'] = [parse(d).year for d in df[date_name]]
     df['month'] = [parse(d).strftime('%b') for d in df[date_name]]
     years = df['year'].unique()
@@ -170,3 +170,18 @@ def plot_violin(df, classes, val, title):
     # Decoration
     plt.title(title, fontsize=22)
     plt.show()
+    
+def scatter_plot(df, x_field, y_field, title = '', x_label = '', y_label ='' , dpi = 80 ):
+    # Draw Scatter Plot
+    plt.figure(figsize=(16, 10), dpi= dpi, facecolor='w', edgecolor='k')
+    plt.scatter( x_field, y_field, 
+                    data=df, 
+                    s=20, c='r')
+
+    # Decorations
+    plt.gca().set( #xlim=(0.0, 0.1), ylim=(0, 90000),
+                  xlabel=x_label, ylabel=y_label)
+
+    plt.xticks(fontsize=12); plt.yticks(fontsize=12)
+    plt.title(title, fontsize=22)  
+    plt.show()  

@@ -20,7 +20,7 @@ def find_outliers(df, comparison_column, filed_value):
     .withColumn("UpperLimit", col("mean") + col("stddev")*3)
     .withColumn("LowerLimit", col("mean") - col("stddev")*3))
 
-    joinDF = df.select('account_id', 'year', filed_value, 'monthly_partition').join(statsDF, ['year'], 'left')
+    joinDF = df.select('account_id', 'year', filed_value, 'monthly_partition').join(statsDF, comparison_column, 'left')
 
     outlierDF = joinDF.withColumn("isOutlier", detectOutlier(col(filed_value), col("UpperLimit"), col("LowerLimit"))).filter(col("isOutlier"))
     
