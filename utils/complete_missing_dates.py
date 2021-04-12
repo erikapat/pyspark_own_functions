@@ -35,7 +35,7 @@ def list_intermediate_dates(df: DataFrame, time_col: str) -> list:
     # 2.-  create the intermediate dates
     first_date, last_date = [ts.date() for ts in min_max_timestamps]
     all_days_in_range = [first_date + timedelta(days=d)
-                         for d in range((last_date - first_date).days + 1)]
+                         for d in range((last_date - first_date).days + 1)] 
     
     return all_days_in_range
     
@@ -98,19 +98,41 @@ def list_intermediate_months(df: DataFrame, time_col: str) -> list:
     return all_month_in_range
 
 
-def complete_missing_months(df: DataFrame, time_col: str, referece_col: str, spark) -> DataFrame:
+def list_intermediate_months_from_values(first_date: str, last_date: str) -> list:
+
+    '''
+    intermedite list of dates from a column
+    '''
+    first_date = datetime.strptime(first_date, '%Y-%m-%d')
+    last_date = datetime.strptime(last_date, '%Y-%m-%d')
+    # create the intermediate dates
+    delta_months = (last_date.year - first_date.year) * 12 + last_date.month - first_date.month
+    all_month_in_range = [first_date + relativedelta(months=d) for d in range((delta_months) + 1)] 
+    #all_month_in_range = [first_date + relativedelta(months=d) for d in range((last_date.month - first_date.month) + 1)] 
+    
+    return all_month_in_range
+
+
+def complete_missing_months(spark, df: DataFrame, time_col: str, referece_col: str, first_date: str = None, last_date: str = None) -> DataFrame: #
     
     '''
     Complete missing dates between rows
     df: dataframe with the missing rows
     time_col: columns of timestamps in format yyyy-MM-dd
     reference_col: column to maintein has reference (just one)
+    If you does not put first_date, last_date, the function calculate this from data
+    Ex:
+    (complete_missing_months(spark, df_group, 'monthly_partition', 'account_id'))
+    If you put it, then the missing dates would calculated over that range
+    Ex:
+    (complete_missing_months(spark, df_group, 'monthly_partition', 'account_id', '1993-01-31', '1998-12-31'))
     '''
     
     df = df.withColumn('monthly_partition', create_partitions_from_df(time_col, "yyyy-MM-dd").cast("timestamp"))
-    #.withColumn('date_aux', first_day_month(time_col))
-    all_months_in_range =list_intermediate_months(df, time_col)
-    #print(all_months_in_range)
+    if ( (first_date == None) or (last_date == None)):
+        all_months_in_range =list_intermediate_months(df, time_col)
+    else:
+        all_months_in_range =list_intermediate_months_from_values(first_date, last_date)
 
     reference_column = [row[referece_col] for row in df.select(referece_col).distinct().collect()]
 
