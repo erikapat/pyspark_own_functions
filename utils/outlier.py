@@ -8,6 +8,12 @@ def detectOutlier(values: column, UpperLimit: column, LowerLimit: column) -> col
     '''
     return (values < LowerLimit) | (values > UpperLimit)
 
+def limits(df, comparison_column, filed_value):
+    
+    return (df.groupby(comparison_column).agg(mean(filed_value).alias("mean"), stddev(filed_value).alias("stddev"))
+    .withColumn("UpperLimit", col("mean") + col("stddev")*3)
+    .withColumn("LowerLimit", col("mean") - col("stddev")*3))
+    
 def find_outliers(df, comparison_column, filed_value):
     '''
     Return thos values that are outliers
@@ -16,12 +22,10 @@ def find_outliers(df, comparison_column, filed_value):
     filed_value: field with the possible outliers
     '''
     
-    statsDF = (df.groupby(comparison_column).agg(mean(filed_value).alias("mean"), stddev(filed_value).alias("stddev"))
-    .withColumn("UpperLimit", col("mean") + col("stddev")*3)
-    .withColumn("LowerLimit", col("mean") - col("stddev")*3))
+    statsDF = limits(df, comparison_column, filed_value)
 
     joinDF = df.select('account_id', 'year', filed_value, 'monthly_partition').join(statsDF, comparison_column, 'left')
-
+    
     outlierDF = joinDF.withColumn("isOutlier", detectOutlier(col(filed_value), col("UpperLimit"), col("LowerLimit"))).filter(col("isOutlier"))
     
     return outlierDF

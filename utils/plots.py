@@ -6,6 +6,20 @@ import matplotlib.pyplot as plt
 
 # Pandas plot
 
+def plot_series_with_uncertainty(df, date_name, yaxis_field, mean_value, sd_value):
+    """
+    Plot series by date and uncertainty,
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    plt.figure(figsize=(16,10), dpi= 80)
+    plt.ylabel("# Orders", fontsize=16)  
+    x = df[mean_value].index
+    plt.plot(x, df[yaxis_field], color="r", lw=2) 
+    plt.fill_between(x, df[mean_value] - df[sd_value], df[mean_value] + df[sd_value], color="#3F5D7D")  
+
 def plot_piramid(df, group_col, x_values, cat, title, x_title, ylabel):
     """
     Plot piramid,
@@ -177,11 +191,71 @@ def scatter_plot(df, x_field, y_field, title = '', x_label = '', y_label ='' , d
     plt.scatter( x_field, y_field, 
                     data=df, 
                     s=20, c='r')
+    plt.plot([0, 50000], [0, 50000], ls="--", c=".3")
 
     # Decorations
     plt.gca().set( #xlim=(0.0, 0.1), ylim=(0, 90000),
                   xlabel=x_label, ylabel=y_label)
-
+    
     plt.xticks(fontsize=12); plt.yticks(fontsize=12)
     plt.title(title, fontsize=22)  
-    plt.show()  
+    plt.show() 
+    
+    
+def plot_series_with_uncertainty_calc(df, date_name, yaxis_field, UpperLimit, LowerLimit):
+    """
+    Plot series by date and uncertainty,
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    df = df.sort_values(by=[date_name])
+    plt.figure(figsize=(16,10), dpi= 80) 
+    x = df[LowerLimit].index
+    plt.plot(df[date_name], df[yaxis_field], color="r", lw=2) 
+    plt.fill_between(df[date_name], df[LowerLimit], df[UpperLimit], color="#f2f2f2") 
+    plt.xticks(fontsize=15, alpha=.7, rotation=90) # x tick size
+    
+#------------- ELIMINATE ------------
+
+# plot type and date
+def plot_different_type_series_wit_limits(df, df_limit, date_name, yaxis_field,type_col, UpperLimit, LowerLimit, title, ytitle,  dpi_value = 58, width = 16, height = 10):
+    """
+    Plot series by date and type,
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    import matplotlib.pyplot as plt
+    df = df.sort_values(by=[date_name])
+    type_ = df[type_col].unique()
+
+    mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
+                'steelblue', 'firebrick', 'mediumseagreen']      
+    plt.figure(figsize=(width, height), dpi= dpi_value)
+
+    for i, y in enumerate(type_):
+        plt.plot(date_name, yaxis_field, data=df.loc[df[type_col]==y, :], color=mycolors[i], label=y)
+        plt.text(df.loc[df[type_col]==y, :].shape[0]-.9, df.loc[df[type_col]==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
+    
+    plt.fill_between(df_limit[date_name], df_limit[LowerLimit], df_limit[UpperLimit], color="#f2f2f2") 
+
+    # Decoration
+    #plt.ylim(50,750)
+    #plt.xlim(-0.3, 11)
+    plt.ylabel(ytitle)
+    plt.yticks(fontsize=12, alpha=.7)
+    plt.xticks(fontsize=15, alpha=.7, rotation=90) # x tick size
+    plt.title(title, fontsize=22)
+    plt.grid(axis='y', alpha=.3)
+
+    # Remove borders
+    plt.gca().spines["top"].set_alpha(0.0)    
+    plt.gca().spines["bottom"].set_alpha(0.5)
+    plt.gca().spines["right"].set_alpha(0.0)    
+    plt.gca().spines["left"].set_alpha(0.5)   
+    plt.legend(loc='upper right', ncol=2, fontsize=12)
+
+    plt.show()

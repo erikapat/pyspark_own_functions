@@ -144,7 +144,7 @@ def complete_missing_months(spark, df: DataFrame, time_col: str, referece_col: s
                                     [time_col, referece_col],
                                     how= "full")
                )
-    return df2 #.drop('date_aux')
+    return df2
 
 
 

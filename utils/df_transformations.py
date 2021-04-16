@@ -2,6 +2,7 @@ from pyspark.sql.functions import month
 #from pyspark.sql.functions import row_number
 #from pyspark.sql.functions import to_date
 #from pyspark.sql.functions import last_day
+from pyspark.sql.window import Window
 import pyspark.sql.functions as F
 from datetime import datetime
 from pyspark.sql import DataFrame
@@ -21,7 +22,8 @@ def date_concatenation(df, field_name):
                 .withColumn(field_name, to_timestamp(concat_ws(' ', date_format(col('date_2'), 'yyyy-MM-dd'), col('hour')), 'yyyy-MM-dd HH:mm')).drop('date_2', 'hour'))
     return df.drop('date')
 
-
+#Please refer to to_explode for a function similar to melt
+"""
 def melt_function(df: DataFrame, by: str)-> DataFrame:
     from pyspark.sql.functions import col, explode, array, struct
     '''
@@ -78,7 +80,7 @@ def arrays_last_n_df_rows(df_att: DataFrame,
        .agg(sf.collect_list('movs').alias('values')))
    
     return df_f
-
+"""
 
 '''
 #susbstract values from a column
@@ -123,3 +125,6 @@ def to_explode(df: DataFrame, by: List[str]) -> DataFrame:
     ])).alias("kvs")
 
     return df.select(by + [kvs]).select(by + ["kvs.field", "kvs.movs"])
+
+
+
