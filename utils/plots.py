@@ -46,7 +46,7 @@ def plot_piramid(df, group_col, x_values, cat, title, x_title, ylabel):
     
 
 # plot type and date
-def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitle,  dpi_value = 58, width = 16, height = 10):
+def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitle,  dpi_value = 58, width = 16, height = 10, text_ = True):
     """
     Plot series by date and type,
     :param df: pandas dataframe with the input data
@@ -64,7 +64,8 @@ def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitl
 
     for i, y in enumerate(type_):
         plt.plot(date_name, yaxis_field, data=df.loc[df[type_col]==y, :], color=mycolors[i], label=y)
-        plt.text(df.loc[df[type_col]==y, :].shape[0]-.9, df.loc[df[type_col]==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
+        if (text_ != False):
+            plt.text(df.loc[df[type_col]==y, :].shape[0]-.9, df.loc[df[type_col]==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
 
         # Decoration
         #plt.ylim(50,750)
@@ -240,7 +241,8 @@ def plot_different_type_series_wit_limits(df, df_limit, date_name, yaxis_field,t
         plt.plot(date_name, yaxis_field, data=df.loc[df[type_col]==y, :], color=mycolors[i], label=y)
         plt.text(df.loc[df[type_col]==y, :].shape[0]-.9, df.loc[df[type_col]==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
     
-    plt.fill_between(df_limit[date_name], df_limit[LowerLimit], df_limit[UpperLimit], color="#f2f2f2") 
+    if (df_limit != []):
+        plt.fill_between(df_limit[date_name], df_limit[LowerLimit], df_limit[UpperLimit], color="#f2f2f2") 
 
     # Decoration
     #plt.ylim(50,750)
