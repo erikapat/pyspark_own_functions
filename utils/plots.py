@@ -4,16 +4,99 @@ from dateutil.parser import parse
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Draw Plot
-def plot_different_series(df, date_name, yaxis_field, title, ytitle):
+# Pandas plot
+
+def plot_series_with_uncertainty(df, date_name, yaxis_field, mean_value, sd_value):
     """
-    Plot annual series for each customer, x axis: mont, y axis: yaxis_field
+    Plot series by date and uncertainty,
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    plt.figure(figsize=(16,10), dpi= 80)
+    plt.ylabel("# Orders", fontsize=16)  
+    x = df[mean_value].index
+    plt.plot(x, df[yaxis_field], color="r", lw=2) 
+    plt.fill_between(x, df[mean_value] - df[sd_value], df[mean_value] + df[sd_value], color="#3F5D7D")  
+
+def plot_piramid(df, group_col, x_values, cat, title, x_title, ylabel):
+    """
+    Plot piramid,
+    :param df: pandas dataframe with the input data
+    :param group_col & group_col: categories
+    :param title, x_title, ylabel: main title and x-y labels
+    
+    """
+    
+    plt.figure(figsize=(13,10), dpi= 80)
+    order_of_bars = df[cat].unique()[::-1]
+    colors = [plt.cm.Spectral(i/float(len(df[group_col].unique())-1)) for i in range(len(df[group_col].unique()))]
+
+    for c, group in zip(colors, df[group_col].unique()):
+        sns.barplot(x=x_values, y=cat, data=df.loc[df[group_col]==group, :], order=order_of_bars, color=c, label=group)
+
+    # Decorations    
+    plt.xlabel(x_title)
+    plt.ylabel(ylabel)
+    plt.yticks(fontsize=12)
+    plt.title(title, fontsize=22)
+    plt.legend()
+    plt.show()
+    
+
+# plot type and date
+def plot_different_type_series(df, date_name, yaxis_field,type_col, title, ytitle,  dpi_value = 58, width = 16, height = 10, text_ = True):
+    """
+    Plot series by date and type,
     :param df: pandas dataframe with the input data
     :param date_name: name of the field with the date
     :param yaxis_field: name of the field in the y-axis
     
     """
     import matplotlib.pyplot as plt
+    df = df.sort_values(by=[date_name])
+    type_ = df[type_col].unique()
+
+    mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
+                'steelblue', 'firebrick', 'mediumseagreen']      
+    plt.figure(figsize=(width, height), dpi= dpi_value)
+
+    for i, y in enumerate(type_):
+        plt.plot(date_name, yaxis_field, data=df.loc[df[type_col]==y, :], color=mycolors[i], label=y)
+        if (text_ != False):
+            plt.text(df.loc[df[type_col]==y, :].shape[0]-.9, df.loc[df[type_col]==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
+
+        # Decoration
+        #plt.ylim(50,750)
+        #plt.xlim(-0.3, 11)
+        plt.ylabel(ytitle)
+        plt.yticks(fontsize=12, alpha=.7)
+        plt.xticks(fontsize=15, alpha=.7, rotation=90) # x tick size
+        plt.title(title, fontsize=22)
+        plt.grid(axis='y', alpha=.3)
+
+        # Remove borders
+        plt.gca().spines["top"].set_alpha(0.0)    
+        plt.gca().spines["bottom"].set_alpha(0.5)
+        plt.gca().spines["right"].set_alpha(0.0)    
+        plt.gca().spines["left"].set_alpha(0.5)   
+        plt.legend(loc='upper right', ncol=2, fontsize=12)
+
+    plt.show()
+    
+
+
+# Draw Plot
+def plot_different_series(df, date_name, yaxis_field, title, ytitle, dpi_value = 58):
+    """
+    Plot annual series for each customer, there is differentiation by year, x axis: month, y axis: yaxis_field
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    
     df['year'] = [parse(d).year for d in df[date_name]]
     df['month'] = [parse(d).strftime('%b') for d in df[date_name]]
     years = df['year'].unique()
@@ -21,7 +104,7 @@ def plot_different_series(df, date_name, yaxis_field, title, ytitle):
 
     mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
                 'steelblue', 'firebrick', 'mediumseagreen']      
-    plt.figure(figsize=(16,10), dpi= 58)
+    plt.figure(figsize=(16,10), dpi= dpi_value)
 
     for i, y in enumerate(years):
         plt.plot('month', yaxis_field, data=df.loc[df.year==y, :], color=mycolors[i], label=y)
@@ -72,6 +155,32 @@ def plot_density(df, density_field, date_name, title = ''):
     plt.title(title, fontsize=22)
     plt.legend()
     plt.show()
+    
+    
+def plot_density_type(df, density_field, type_field, title = ''):
+    """
+    Plot  density by year
+    :param df: pandas dataframe with the input data
+    :param density_field: which field use to get the density
+    :param date_name: name of the field with the date
+    :param title: title of the plot
+    
+    """
+    
+    type_ = df[type_field].unique()
+
+    mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
+                'steelblue', 'firebrick', 'mediumseagreen']      
+    plt.figure(figsize=(16,10), dpi= 50)
+
+    for i, y in enumerate(type_):
+        # Draw Plot
+        sns.kdeplot(df.loc[df[type_field] == y, density_field], shade=True, color=mycolors[i], label=y, alpha=.7)
+
+    # Decoration
+    plt.title(title, fontsize=22)
+    plt.legend()
+    plt.show()
 
 def plot_box(df, classes, val, title):
 
@@ -101,4 +210,80 @@ def plot_violin(df, classes, val, title):
 
     # Decoration
     plt.title(title, fontsize=22)
+    plt.show()
+    
+def scatter_plot(df, x_field, y_field, title = '', x_label = '', y_label ='' , dpi = 80 ):
+    # Draw Scatter Plot
+    plt.figure(figsize=(16, 10), dpi= dpi, facecolor='w', edgecolor='k')
+    plt.scatter( x_field, y_field, 
+                    data=df, 
+                    s=20, c='r')
+    plt.plot([0, 50000], [0, 50000], ls="--", c=".3")
+
+    # Decorations
+    plt.gca().set( #xlim=(0.0, 0.1), ylim=(0, 90000),
+                  xlabel=x_label, ylabel=y_label)
+    
+    plt.xticks(fontsize=12); plt.yticks(fontsize=12)
+    plt.title(title, fontsize=22)  
+    plt.show() 
+    
+    
+def plot_series_with_uncertainty_calc(df, date_name, yaxis_field, UpperLimit, LowerLimit):
+    """
+    Plot series by date and uncertainty,
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    df = df.sort_values(by=[date_name])
+    plt.figure(figsize=(16,10), dpi= 80) 
+    x = df[LowerLimit].index
+    plt.plot(df[date_name], df[yaxis_field], color="r", lw=2) 
+    plt.fill_between(df[date_name], df[LowerLimit], df[UpperLimit], color="#f2f2f2") 
+    plt.xticks(fontsize=15, alpha=.7, rotation=90) # x tick size
+    
+#------------- ELIMINATE ------------
+
+# plot type and date
+def plot_different_type_series_wit_limits(df, df_limit, date_name, yaxis_field,type_col, UpperLimit, LowerLimit, title, ytitle,  dpi_value = 58, width = 16, height = 10):
+    """
+    Plot series by date and type,
+    :param df: pandas dataframe with the input data
+    :param date_name: name of the field with the date
+    :param yaxis_field: name of the field in the y-axis
+    
+    """
+    import matplotlib.pyplot as plt
+    df = df.sort_values(by=[date_name])
+    type_ = df[type_col].unique()
+
+    mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
+                'steelblue', 'firebrick', 'mediumseagreen']      
+    plt.figure(figsize=(width, height), dpi= dpi_value)
+
+    for i, y in enumerate(type_):
+        plt.plot(date_name, yaxis_field, data=df.loc[df[type_col]==y, :], color=mycolors[i], label=y)
+        plt.text(df.loc[df[type_col]==y, :].shape[0]-.9, df.loc[df[type_col]==y, yaxis_field][-1:].values[0], y, fontsize=12, color=mycolors[i])
+    
+    if (df_limit != []):
+        plt.fill_between(df_limit[date_name], df_limit[LowerLimit], df_limit[UpperLimit], color="#f2f2f2") 
+
+    # Decoration
+    #plt.ylim(50,750)
+    #plt.xlim(-0.3, 11)
+    plt.ylabel(ytitle)
+    plt.yticks(fontsize=12, alpha=.7)
+    plt.xticks(fontsize=15, alpha=.7, rotation=90) # x tick size
+    plt.title(title, fontsize=22)
+    plt.grid(axis='y', alpha=.3)
+
+    # Remove borders
+    plt.gca().spines["top"].set_alpha(0.0)    
+    plt.gca().spines["bottom"].set_alpha(0.5)
+    plt.gca().spines["right"].set_alpha(0.0)    
+    plt.gca().spines["left"].set_alpha(0.5)   
+    plt.legend(loc='upper right', ncol=2, fontsize=12)
+
     plt.show()
