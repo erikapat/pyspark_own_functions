@@ -155,6 +155,32 @@ def plot_density(df, density_field, date_name, title = ''):
     plt.title(title, fontsize=22)
     plt.legend()
     plt.show()
+    
+    
+def plot_density_type(df, density_field, type_field, title = ''):
+    """
+    Plot  density by year
+    :param df: pandas dataframe with the input data
+    :param density_field: which field use to get the density
+    :param date_name: name of the field with the date
+    :param title: title of the plot
+    
+    """
+    
+    type_ = df[type_field].unique()
+
+    mycolors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:brown', 'tab:grey', 'tab:pink', 'tab:olive', 'deeppink',
+                'steelblue', 'firebrick', 'mediumseagreen']      
+    plt.figure(figsize=(16,10), dpi= 50)
+
+    for i, y in enumerate(type_):
+        # Draw Plot
+        sns.kdeplot(df.loc[df[type_field] == y, density_field], shade=True, color=mycolors[i], label=y, alpha=.7)
+
+    # Decoration
+    plt.title(title, fontsize=22)
+    plt.legend()
+    plt.show()
 
 def plot_box(df, classes, val, title):
 
