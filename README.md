@@ -5,9 +5,9 @@ The objective of this repo is to create functions that can be reusable.
 
 The functions are in **utils**. The noteboks are only used as examples of how to use the functions.
 
-1. [Functions related wint partitions](./Partitions.ipynb)
+1. [Functions related with partitions](./Partitions.ipynb)
 
-2. [Functions related wint operations with dates](./OperationsWithDates.ipynb)
+2. [Functions related with operations with dates](./OperationsWithDates.ipynb)
 
 3. [Complete missing partitions](./CompleteMissingPartitions.ipynb)
 
